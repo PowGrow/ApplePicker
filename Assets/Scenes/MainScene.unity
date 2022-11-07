@@ -2004,7 +2004,7 @@ MonoBehaviour:
   _gameOverUI: {fileID: 73876797}
   _gameUI: {fileID: 1068668210}
   _appleTree: {fileID: 1058115721}
-  _currentLevel: 1
+  _currentLevel: 5
   _currentLevelLabel: {fileID: 571651937}
 --- !u!4 &898599308
 Transform:

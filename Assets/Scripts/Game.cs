@@ -123,6 +123,7 @@ public class Game : MonoBehaviour
 
         if(_currentScore == _currentLevel)
         {
+            Messenger.Broadcast(GameEvent.NEXT_LEVEL);
             _currentLevel += 1;
             _currentLevelLabel.text = _currentLevel.ToString();
         }

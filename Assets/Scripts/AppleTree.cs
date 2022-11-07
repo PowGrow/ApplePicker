@@ -12,6 +12,8 @@ public class AppleTree : MonoBehaviour
     private float _edge;
     private float _timer = 0f;
     private SpriteRenderer _spriteRenderer;
+    private const float OFFSET = 0.5f;
+    private float _direction = 1;
 
 
     public float Speed
@@ -22,20 +24,24 @@ public class AppleTree : MonoBehaviour
 
     private void Moving()
     {
-        transform.position = new Vector2(transform.position.x + Speed * Time.deltaTime, transform.position.y);
+        RandomChangeDirection();
         ChangeDirection();
+        transform.position = new Vector2(transform.position.x + _direction * Speed * Time.deltaTime, transform.position.y);
     }
 
     private void ChangeDirection()
     {
-        if(Math.Abs(transform.position.x) > _edge)
-            _speed *= -1;
+        if (transform.position.x > _edge)
+            _direction = -1;
+
+        if (transform.position.x < _edge * -1)
+            _direction = 1;
     }
 
     private void RandomChangeDirection()
     {
-        if (UnityEngine.Random.value < _rndChance)
-            _speed *= -1;
+        if (UnityEngine.Random.value < _rndChance && transform.position.x < _edge && transform.position.x > -1 * _edge)
+            _direction *= -1;
     }
 
     private void DropApple()
@@ -43,10 +49,24 @@ public class AppleTree : MonoBehaviour
         GameObject apple = Instantiate(_applePrefab);
         apple.transform.position = new Vector3(transform.position.x, transform.position.y - 0.5f, -2);
     }
+
+    private void TreeRage()
+    {
+        _spriteRenderer.color = new Color(_spriteRenderer.color.r,
+                                  Math.Clamp(_spriteRenderer.color.g - 0.05f, 0, 255),
+                                  Math.Clamp(_spriteRenderer.color.b - 0.05f, 0, 255));
+    }
     private void Awake()
     {
-        _edge = Camera.main.orthographicSize * Screen.width / Screen.height;
+        _edge = Camera.main.orthographicSize * Screen.width / Screen.height - OFFSET;
         _spriteRenderer = this.gameObject.GetComponent<SpriteRenderer>();
+
+        Messenger.AddListener(GameEvent.NEXT_LEVEL, TreeRage);
+    }
+
+    private void OnDestroy()
+    {
+        Messenger.RemoveListener(GameEvent.NEXT_LEVEL, TreeRage);
     }
 
     private void Update()
@@ -58,13 +78,5 @@ public class AppleTree : MonoBehaviour
             _timer = 0f;
         }  
         Moving();
-    }
-
-    private void FixedUpdate()
-    {
-        RandomChangeDirection();
-        _spriteRenderer.color = new Color(Math.Clamp(_spriteRenderer.color.r + _game.CurrentLevel * 2,0,255), 
-                                          Math.Clamp(_spriteRenderer.color.g - _game.CurrentLevel * 2,0,255), 
-                                          Math.Clamp(_spriteRenderer.color.b - _game.CurrentLevel * 2,0,255));
     }
 }
